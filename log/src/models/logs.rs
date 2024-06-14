@@ -1,7 +1,6 @@
-use chrono;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, sqlx::FromRow, Serialize)]
 pub struct Log {
     pub id: i32,
     pub message: String,

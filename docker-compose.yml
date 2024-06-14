@@ -1,6 +1,24 @@
-version: "3.5"
-
 services:
+  app-temperature:
+    build: ./temperature
+    container_name: app-temperature
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db-temperature/temperature
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db-temperature
+
+  app-log:
+    build: ./log
+    container_name: app-log
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db-log/log
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db-log
+
   db-temperature:
     container_name: db-temperature
     image: postgres:16
@@ -8,11 +26,11 @@ services:
       - ./temperature/db:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_DB: temperature
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     restart: "on-failure"
     healthcheck:
-      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d access'"]
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d temperature'"]
       interval: 10s
       timeout: 3s
       retries: 5
@@ -26,11 +44,11 @@ services:
       - ./log/db:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_DB: log
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     restart: "on-failure"
     healthcheck:
-      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d access'"]
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d log'"]
       interval: 10s
       timeout: 3s
       retries: 5
