@@ -66,7 +66,12 @@ pub async fn get_logs(
         total_count = page_count;
     }
 
-    let total_pages = (total_count as f64 / page_size as f64) as i64;
+    let total_pages_calc = (total_count as f64 / page_size as f64) as i64;
+    let total_pages = if total_pages_calc > 0 {
+        total_pages_calc
+    } else {
+        1
+    };
 
     let query = format!(
         "SELECT id, message, created FROM log ORDER BY id DESC LIMIT {} OFFSET {}",
